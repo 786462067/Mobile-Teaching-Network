@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>移动教学网 - 文件传输</title>
+<title>文件传输助手</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
   :root {
@@ -33,6 +33,7 @@
   .header { position: fixed; top: 0; left: 0; right: 0; height: var(--header-h); background: #fff; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; padding: 0 24px; z-index: 100; }
   .header-logo { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 600; color: var(--primary); flex-shrink: 0; }
   .header-logo i { font-size: 22px; }
+  .cloud-tag { display: inline-flex; align-items: center; padding: 2px 10px; font-size: 12px; font-weight: 500; color: #fff; background: var(--primary); border-radius: 10px; }
   .header-nav { display: flex; align-items: center; gap: 4px; margin-left: 40px; }
   .nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 14px; color: var(--gray-500); transition: all .15s; }
   .nav-item:hover { background: var(--gray-50); color: var(--gray-600); }
@@ -42,6 +43,9 @@
   .header-right { display: flex; align-items: center; gap: 20px; margin-left: auto; }
   .user-name { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--gray-500); }
   .user-name i { font-size: 16px; color: var(--gray-400); }
+  .logout-btn { display: none; align-items: center; gap: 6px; padding: 6px 14px; font-size: 13px; font-weight: 500; color: var(--gray-600); background: var(--gray-100); border-radius: 6px; cursor: pointer; border: none; transition: all .15s; }
+  .logout-btn:hover { background: var(--danger); color: #fff; }
+  .logout-btn.show { display: inline-flex; }
   .storage-info { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-400); }
   .storage-bar { width: 100px; height: 6px; background: var(--gray-200); border-radius: 3px; overflow: hidden; }
   .storage-bar-fill { height: 100%; background: var(--primary); border-radius: 3px; transition: width .3s; }
@@ -56,6 +60,9 @@
   .page-title { font-size: 20px; font-weight: 600; color: var(--gray-600); margin-bottom: 4px; }
   .page-desc { font-size: 13px; color: var(--gray-400); }
   .toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .btn-upload { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; background: linear-gradient(135deg, #378ADD, #185FA5); color: #fff; box-shadow: 0 2px 8px rgba(55,138,221,.35); transition: all .2s; margin-left: 24px; flex-shrink: 0; }
+  .btn-upload:hover { box-shadow: 0 4px 16px rgba(55,138,221,.5); transform: translateY(-1px); }
+  .btn-upload i { font-size: 16px; }
   .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--gray-200); background: #fff; color: var(--gray-600); transition: all .15s; }
   .btn:hover { border-color: var(--gray-300); }
   .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
@@ -111,35 +118,6 @@
   .page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
   .page-btn.disabled { opacity: .4; cursor: not-allowed; }
 
-  /* File manage layout: tree + table */
-  .file-manage-layout { display: flex; gap: 20px; }
-  .tree-panel { width: 240px; flex-shrink: 0; background: #fff; border: 1px solid var(--gray-200); border-radius: 10px; overflow: hidden; }
-  .tree-header { padding: 14px 16px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; }
-  .tree-header-title { font-size: 14px; font-weight: 600; color: var(--gray-600); display: flex; align-items: center; gap: 6px; }
-  .tree-header-actions { display: flex; gap: 2px; }
-  .tree-action-btn { width: 28px; height: 28px; border-radius: 6px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--gray-400); transition: all .15s; }
-  .tree-action-btn:hover { background: var(--gray-100); color: var(--gray-600); }
-  .tree-body { padding: 8px; max-height: 500px; overflow-y: auto; }
-
-  .tree-node { user-select: none; }
-  .tree-node-row { display: flex; align-items: center; gap: 4px; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background .1s; font-size: 13px; color: var(--gray-500); }
-  .tree-node-row:hover { background: var(--gray-50); }
-  .tree-node-row.selected { background: var(--primary-light); color: var(--primary); font-weight: 500; }
-  .tree-node-row .toggle { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 10px; color: var(--gray-300); transition: transform .2s; border-radius: 3px; }
-  .tree-node-row .toggle:hover { background: var(--gray-200); color: var(--gray-500); }
-  .tree-node-row .toggle.expanded { transform: rotate(90deg); }
-  .tree-node-row .toggle.empty { visibility: hidden; }
-  .tree-node-row .folder-ico { font-size: 14px; color: var(--warning); flex-shrink: 0; }
-  .tree-node-row .folder-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .tree-node-row .node-actions { display: flex; gap: 1px; opacity: 0; transition: opacity .1s; }
-  .tree-node-row:hover .node-actions { opacity: 1; }
-  .tree-node-row .node-action { width: 22px; height: 22px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--gray-300); border-radius: 4px; transition: all .1s; }
-  .tree-node-row .node-action:hover { background: var(--gray-200); color: var(--gray-600); }
-  .tree-node-row .node-action.del:hover { background: var(--danger-light); color: var(--danger); }
-  .tree-children { padding-left: 16px; }
-
-  .file-panel { flex: 1; min-width: 0; }
-
   /* Modal */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 500; display: none; align-items: center; justify-content: center; }
   .modal-overlay.show { display: flex; }
@@ -167,6 +145,27 @@
   .upload-zone p { color: var(--gray-400); font-size: 14px; }
   .upload-zone .hint { font-size: 12px; color: var(--gray-300); margin-top: 4px; }
 
+  /* Transfer animation */
+  .transfer-animation { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 16px; padding: 14px 16px; background: var(--gray-50); border-radius: 8px; }
+  .transfer-endpoint { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: #fff; border-radius: 6px; border: 1px solid var(--gray-200); font-size: 12px; font-weight: 600; color: var(--gray-500); }
+  .transfer-endpoint i { font-size: 16px; }
+  .transfer-endpoint:first-child i { color: var(--primary); }
+  .transfer-endpoint:last-child i { color: var(--success); }
+  .transfer-track { position: relative; width: 100px; height: 20px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .transfer-track::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: var(--gray-200); border-radius: 1px; }
+  .transfer-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); position: relative; z-index: 1; animation: transferFlow 1.2s ease-in-out infinite; }
+  .transfer-dot:nth-child(2) { animation-delay: 0.4s; }
+  .transfer-dot:nth-child(3) { animation-delay: 0.8s; }
+  .transfer-arrow { color: var(--primary); font-size: 12px; position: relative; z-index: 1; animation: arrowPulse 1.2s ease-in-out infinite; }
+  @keyframes transferFlow {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.5); }
+  }
+  @keyframes arrowPulse {
+    0%, 100% { opacity: 0.5; transform: translateX(0); }
+    50% { opacity: 1; transform: translateX(4px); }
+  }
+
   /* Confirm dialog */
   .confirm-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--danger-light); color: var(--danger); display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px; }
   .confirm-title { font-size: 16px; font-weight: 600; color: var(--gray-600); text-align: center; margin-bottom: 8px; }
@@ -180,8 +179,6 @@
   /* Responsive */
   @media (max-width: 768px) {
     .header-nav { display: none; }
-    .file-manage-layout { flex-direction: column; }
-    .tree-panel { width: 100%; }
   }
 
   /* Animations */
@@ -194,29 +191,30 @@
 <!-- Header -->
 <div class="header">
   <div class="header-logo">
-    <i class="fas fa-graduation-cap"></i>
-    <span>移动教学网 - 文件传输</span>
+    <i class="fas fa-folder-open"></i>
+    <span>文件传输助手</span>
+    <span class="cloud-tag" id="cloudTag" style="display:none;">移动教学网</span>
   </div>
   <div class="header-nav">
     <div class="nav-item active" data-page="fileManage" onclick="switchPage('fileManage')">
-      <i class="fas fa-folder-open"></i> 文件管理
+      <i class="fas fa-file-alt"></i> 接收到的文件
     </div>
     <div class="nav-item" data-page="uploadRecord" onclick="switchPage('uploadRecord')">
       <i class="fas fa-history"></i> 上传记录
     </div>
-    <div class="nav-item" data-page="approvalList" onclick="switchPage('approvalList')">
+    <div class="nav-item" data-page="approvalList" onclick="switchPage('approvalList')" id="nav-approvalList">
       <i class="fas fa-clipboard-check"></i> 审批列表
       <span class="badge">3</span>
     </div>
+    <button class="btn-upload" onclick="showUploadModal()" style="display:none;" id="headerUploadBtn">
+      <i class="fas fa-cloud-upload-alt"></i> 上传文件
+    </button>
   </div>
   <div class="header-right">
-    <div class="storage-info">
-      <i class="fas fa-database"></i>
-      <span id="storageText">已用 2.3 GB / 10 GB</span>
-      <div class="storage-bar"><div class="storage-bar-fill" style="width:23%"></div></div>
-    </div>
-    <button class="btn" onclick="window.location.href='../dashboard.html'"><i class="fas fa-arrow-left"></i> 返回门户</button>
     <div class="user-name"><i class="fas fa-user-circle"></i> 张老师</div>
+    <button class="logout-btn" id="logoutBtn">
+      <i class="fas fa-sign-out-alt"></i> 退出登录
+    </button>
   </div>
 </div>
 
@@ -226,39 +224,18 @@
   <!-- Page: File Management -->
   <div class="page active" id="page-fileManage">
     <div class="page-header">
-      <div class="page-title">文件管理</div>
-      <div class="page-desc">以文件夹形式管理文件，支持上传、预览、下载、删除等操作</div>
+      <div class="page-title">接收到的文件</div>
+      <div class="page-desc" id="filePageDesc">统一管理所有接收到的文件，支持预览、下载、删除等操作</div>
     </div>
 
-    <div class="file-manage-layout">
-      <!-- Left: Tree -->
-      <div class="tree-panel">
-        <div class="tree-header">
-          <div class="tree-header-title"><i class="fas fa-sitemap"></i> 文件夹</div>
-          <div class="tree-header-actions">
-            <button class="tree-action-btn" title="新建文件夹" onclick="showCreateFolder(0)"><i class="fas fa-folder-plus"></i></button>
-          </div>
-        </div>
-        <div class="tree-body" id="treeBody"></div>
+    <div class="toolbar">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="搜索文件..." id="searchInput" oninput="renderFileTable()">
       </div>
+    </div>
 
-      <!-- Right: File Table -->
-      <div class="file-panel">
-        <div id="filePanelHeader">
-          <div style="font-size:15px;font-weight:600;color:var(--gray-600);margin-bottom:12px;display:flex;align-items:center;gap:6px;" id="currentFolderTitle">
-            <i class="fas fa-folder-open" style="font-size:14px;color:var(--warning)"></i> 全部
-          </div>
-        </div>
-        <div class="toolbar">
-          <button class="btn btn-primary" onclick="showUploadModal()"><i class="fas fa-cloud-upload-alt"></i> 上传文件</button>
-          <button class="btn" onclick="showCreateFolder(currentFolderId)" id="btnNewSubFolder"><i class="fas fa-folder-plus"></i> 新建子文件夹</button>
-          <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="搜索文件..." id="searchInput" oninput="renderFileTable()">
-          </div>
-        </div>
-
-        <div class="table-card" id="fileTableCard" style="display:none">
+    <div class="table-card" id="fileTableCard">
           <div class="table-wrap">
             <table>
               <thead>
@@ -267,7 +244,6 @@
                   <th>文件类型</th>
                   <th>文件大小</th>
                   <th>上传时间</th>
-                  <th>数据来源</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -278,11 +254,9 @@
         </div>
 
         <div class="empty-state" id="fileEmptyState">
-          <i class="fas fa-folder-open"></i>
-          <p>请从左侧选择文件夹查看文件</p>
+          <i class="fas fa-file-alt"></i>
+          <p>暂无文件，请上传文件</p>
         </div>
-      </div>
-    </div>
   </div>
 
   <!-- Page: Upload Record -->
@@ -297,29 +271,22 @@
       <input type="date" style="padding:7px 12px;font-size:13px;border:1px solid var(--gray-200);border-radius:6px;outline:none;" id="recordDateFrom" onchange="renderRecordTable()">
       <span style="color:var(--gray-300);">至</span>
       <input type="date" style="padding:7px 12px;font-size:13px;border:1px solid var(--gray-200);border-radius:6px;outline:none;" id="recordDateTo" onchange="renderRecordTable()">
+      <span id="statusFilterWrapper">
       <select class="form-select" style="width:140px;padding:7px 12px;font-size:13px;border:1px solid var(--gray-200);border-radius:6px;" id="statusFilter" onchange="renderRecordTable()">
         <option value="">全部状态</option>
         <option value="pending">待审批</option>
-        <option value="normal">正常</option>
-        <option value="rejected">已拒绝</option>
-        <option value="deleted">已删除</option>
+        <option value="normal">通过</option>
+        <option value="rejected">不通过</option>
       </select>
+      </span>
     </div>
 
     <div class="table-card">
       <div class="table-wrap">
         <table>
           <thead>
-            <tr>
-              <th>文件名称</th>
-              <th>文件类型</th>
-              <th>文件大小</th>
-              <th>上传时间</th>
-              <th>数据来源</th>
-              <th>审批者</th>
-              <th>状态</th>
-              <th>拒绝原因</th>
-              <th>操作</th>
+            <tr id="recordTableHeader">
+              <!-- JS 动态生成表头 -->
             </tr>
           </thead>
           <tbody id="recordTableBody"></tbody>
@@ -343,8 +310,9 @@
       <input type="date" style="padding:7px 12px;font-size:13px;border:1px solid var(--gray-200);border-radius:6px;outline:none;" id="approvalDateTo" onchange="renderApprovalTable()">
       <select class="form-select" style="width:140px;padding:7px 12px;font-size:13px;border:1px solid var(--gray-200);border-radius:6px;" id="approvalStatusFilter" onchange="renderApprovalTable()">
         <option value="">全部状态</option>
-        <option value="unapproved">未审批</option>
-        <option value="approved">已审批</option>
+        <option value="unapproved">待审批</option>
+        <option value="approved">通过</option>
+        <option value="rejected">不通过</option>
       </select>
     </div>
 
@@ -356,10 +324,10 @@
               <th>文件名称</th>
               <th>文件类型</th>
               <th>文件大小</th>
-              <th>数据来源</th>
               <th>上传者</th>
               <th>上传时间</th>
               <th>状态</th>
+              <th>不通过原因</th>
               <th>操作</th>
             </tr>
           </thead>
@@ -420,6 +388,22 @@
       <button class="modal-close" onclick="closeModal('modalUpload')"><i class="fas fa-times"></i></button>
     </div>
     <div class="modal-body">
+      <div class="transfer-animation" id="transferAnim">
+        <div class="transfer-endpoint" id="transferFrom">
+          <i class="fas fa-globe"></i>
+          <span>互联网</span>
+        </div>
+        <div class="transfer-track">
+          <div class="transfer-dot"></div>
+          <div class="transfer-dot"></div>
+          <div class="transfer-dot"></div>
+          <div class="transfer-arrow"><i class="fas fa-chevron-right"></i></div>
+        </div>
+        <div class="transfer-endpoint" id="transferTo">
+          <i class="fas fa-graduation-cap"></i>
+          <span>移动教学网</span>
+        </div>
+      </div>
       <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
         <i class="fas fa-cloud-upload-alt"></i>
         <p>点击或拖拽文件到此处上传</p>
@@ -427,7 +411,7 @@
       </div>
       <input type="file" id="fileInput" multiple style="display:none" onchange="handleFileSelect(event)">
       <div id="uploadFileList" style="margin-top:16px"></div>
-      <div id="approverGroup" style="margin-top:16px;">
+      <div id="approverGroup" style="margin-top:16px; display:none;">
         <div class="form-group">
           <label class="form-label">选择审批者</label>
           <select class="form-select" id="approverSelect">
@@ -469,7 +453,7 @@
 <div class="modal-overlay" id="modalApproval">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title" id="approvalModalTitle">审批操作</div>
+      <div class="modal-title" id="approvalModalTitle">不通过原因</div>
       <button class="modal-close" onclick="closeModal('modalApproval')"><i class="fas fa-times"></i></button>
     </div>
     <div class="modal-body">
@@ -477,7 +461,7 @@
         <div style="font-weight:600;margin-bottom:6px;" id="approvalFileName"></div>
         <div style="color:var(--gray-400)" id="approvalFileMeta"></div>
       </div>
-      <div id="rejectReasonGroup" style="display:none">
+      <div id="rejectReasonGroup">
         <div class="form-group">
           <label class="form-label">拒绝原因</label>
           <textarea class="form-textarea" id="rejectReasonInput" placeholder="请输入拒绝原因..."></textarea>
@@ -486,8 +470,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modalApproval')">取消</button>
-      <button class="btn btn-danger" id="rejectBtn" onclick="submitApproval('reject')"><i class="fas fa-times"></i> 拒绝</button>
-      <button class="btn btn-success" id="approveBtn" onclick="submitApproval('approve')"><i class="fas fa-check"></i> 通过</button>
+      <button class="btn btn-danger" id="rejectBtn" onclick="submitReject()"><i class="fas fa-times"></i> 确认不通过</button>
     </div>
   </div>
 </div>
@@ -582,18 +565,18 @@ const recordData = [
 ];
 
 const approvalData = [
-  { id: 1, name: '操作系统笔记.docx', type: 'doc', size: '1.8 MB', source: '云桌面', uploader: '张老师', uploadTime: '2026-05-11 16:42', status: 'unapproved' },
-  { id: 2, name: '项目需求文档.pdf', type: 'pdf', size: '4.5 MB', source: '云桌面', uploader: '张老师', uploadTime: '2026-05-06 13:40', status: 'unapproved' },
-  { id: 3, name: '数据库设计文档.pdf', type: 'pdf', size: '2.3 MB', source: '云桌面', uploader: '刘老师', uploadTime: '2026-05-14 09:30', status: 'unapproved' },
-  { id: 4, name: '新版教材扫描件.pdf', type: 'pdf', size: '18 MB', source: '云桌面', uploader: '陈老师', uploadTime: '2026-05-14 08:15', status: 'unapproved' },
-  { id: 5, name: '课程安排表.xlsx', type: 'xls', size: '156 KB', source: '云桌面', uploader: '王老师', uploadTime: '2026-05-13 17:00', status: 'unapproved' },
-  { id: 6, name: '学生签到数据.xlsx', type: 'xls', size: '890 KB', source: '云桌面', uploader: '孙老师', uploadTime: '2026-05-13 14:22', status: 'unapproved' },
-  { id: 7, name: '毕业论文模板.docx', type: 'doc', size: '560 KB', source: '云桌面', uploader: '李老师', uploadTime: '2026-05-13 10:05', status: 'unapproved' },
-  { id: 8, name: '实验指导书.pdf', type: 'pdf', size: '3.4 MB', source: '云桌面', uploader: '赵老师', uploadTime: '2026-05-12 16:45', status: 'unapproved' },
-  { id: 9, name: '教学评估报告.pdf', type: 'pdf', size: '1.7 MB', source: '云桌面', uploader: '周老师', uploadTime: '2026-05-11 11:30', status: 'approved' },
-  { id: 10, name: '课件素材包.zip', type: 'zip', size: '45 MB', source: '云桌面', uploader: '吴老师', uploadTime: '2026-05-10 09:00', status: 'approved' },
-  { id: 11, name: '期中考试成绩.xlsx', type: 'xls', size: '420 KB', source: '云桌面', uploader: '张老师', uploadTime: '2026-05-09 15:20', status: 'approved' },
-  { id: 12, name: '教学视频链接.docx', type: 'doc', size: '180 KB', source: '云桌面', uploader: '刘老师', uploadTime: '2026-05-08 14:10', status: 'approved' },
+  { id: 1, name: '操作系统笔记.docx', type: 'doc', size: '1.8 MB', source: '云桌面', uploader: '张老师', uploadTime: '2026-05-11 16:42', status: 'unapproved', reason: '' },
+  { id: 2, name: '项目需求文档.pdf', type: 'pdf', size: '4.5 MB', source: '云桌面', uploader: '张老师', uploadTime: '2026-05-06 13:40', status: 'unapproved', reason: '' },
+  { id: 3, name: '数据库设计文档.pdf', type: 'pdf', size: '2.3 MB', source: '云桌面', uploader: '刘老师', uploadTime: '2026-05-14 09:30', status: 'unapproved', reason: '' },
+  { id: 4, name: '新版教材扫描件.pdf', type: 'pdf', size: '18 MB', source: '云桌面', uploader: '陈老师', uploadTime: '2026-05-14 08:15', status: 'unapproved', reason: '' },
+  { id: 5, name: '课程安排表.xlsx', type: 'xls', size: '156 KB', source: '云桌面', uploader: '王老师', uploadTime: '2026-05-13 17:00', status: 'unapproved', reason: '' },
+  { id: 6, name: '学生签到数据.xlsx', type: 'xls', size: '890 KB', source: '云桌面', uploader: '孙老师', uploadTime: '2026-05-13 14:22', status: 'unapproved', reason: '' },
+  { id: 7, name: '毕业论文模板.docx', type: 'doc', size: '560 KB', source: '云桌面', uploader: '李老师', uploadTime: '2026-05-13 10:05', status: 'unapproved', reason: '' },
+  { id: 8, name: '实验指导书.pdf', type: 'pdf', size: '3.4 MB', source: '云桌面', uploader: '赵老师', uploadTime: '2026-05-12 16:45', status: 'unapproved', reason: '' },
+  { id: 9, name: '教学评估报告.pdf', type: 'pdf', size: '1.7 MB', source: '云桌面', uploader: '周老师', uploadTime: '2026-05-11 11:30', status: 'approved', reason: '' },
+  { id: 10, name: '课件素材包.zip', type: 'zip', size: '45 MB', source: '云桌面', uploader: '吴老师', uploadTime: '2026-05-10 09:00', status: 'approved', reason: '' },
+  { id: 11, name: '期中考试成绩.xlsx', type: 'xls', size: '420 KB', source: '云桌面', uploader: '张老师', uploadTime: '2026-05-09 15:20', status: 'approved', reason: '' },
+  { id: 12, name: '教学视频链接.docx', type: 'doc', size: '180 KB', source: '云桌面', uploader: '刘老师', uploadTime: '2026-05-08 14:10', status: 'approved', reason: '' },
 ];
 
 // ====== PAGE NAVIGATION ======
@@ -633,11 +616,11 @@ function getTypeLabel(type) {
 function getStatusInfo(status) {
   const map = {
     pending: { label: '待审批', cls: 'pending' },
-    normal: { label: '正常', cls: 'normal' },
-    rejected: { label: '已拒绝', cls: 'rejected' },
+    normal: { label: '通过', cls: 'normal' },
+    rejected: { label: '不通过', cls: 'rejected' },
     deleted: { label: '已删除', cls: 'deleted' },
-    approved: { label: '已审批', cls: 'approved' },
-    unapproved: { label: '未审批', cls: 'unapproved' },
+    approved: { label: '通过', cls: 'approved' },
+    unapproved: { label: '待审批', cls: 'unapproved' },
   };
   return map[status] || { label: status, cls: '' };
 }
@@ -820,17 +803,13 @@ function renderFileTable() {
   const empty = document.getElementById('fileEmptyState');
   const search = (document.getElementById('searchInput').value || '').toLowerCase();
 
-  let files = currentFolderId === 0 ? [...fileData] : fileData.filter(f => f.folderId === currentFolderId);
+  let files = [...fileData];
   if (search) files = files.filter(f => f.name.toLowerCase().includes(search));
 
   if (files.length === 0) {
     card.style.display = 'none';
     empty.style.display = 'block';
-    if (currentFolderId && currentFolderId !== 0) {
-      empty.innerHTML = '<i class="fas fa-folder-open"></i><p>当前文件夹暂无文件</p>';
-    } else {
-      empty.innerHTML = '<i class="fas fa-folder-open"></i><p>暂无文件</p>';
-    }
+    empty.innerHTML = '<i class="fas fa-file-alt"></i><p>暂无文件，请上传文件</p>';
     return;
   }
   empty.style.display = 'none';
@@ -844,7 +823,6 @@ function renderFileTable() {
       <td>${getTypeLabel(f.type)}</td>
       <td>${f.size}</td>
       <td>${f.uploadTime}</td>
-      <td><span style="display:inline-flex;align-items:center;gap:4px;"><i class="fas fa-${f.source === '本地电脑' ? 'laptop' : 'cloud'}" style="font-size:12px;color:var(--gray-400)"></i> ${f.source}</span></td>
       <td>
         <div class="td-actions">
           <button class="btn-text btn-sm" onclick="previewFile('${f.name}','${f.type}')"><i class="fas fa-eye"></i> 预览</button>
@@ -866,11 +844,25 @@ const recordPageSize = 8;
 
 function renderRecordTable() {
   const tbody = document.getElementById('recordTableBody');
+  const thead = document.getElementById('recordTableHeader');
+  const urlParams = new URLSearchParams(window.location.search);
+  const source = urlParams.get('source');
+  const isCloud = source === 'portal';
+  
+  // 动态生成表头
+  if (isCloud) {
+    thead.innerHTML = '<th>文件名称</th><th>文件类型</th><th>文件大小</th><th>上传时间</th><th>审批者</th><th>状态</th><th>拒绝原因</th>';
+  } else {
+    thead.innerHTML = '<th>文件名称</th><th>文件类型</th><th>文件大小</th><th>上传时间</th>';
+  }
+  
   const nameQ = (document.getElementById('recordNameInput').value || '').toLowerCase();
   const dateFrom = document.getElementById('recordDateFrom').value;
   const dateTo = document.getElementById('recordDateTo').value;
   const statusF = document.getElementById('statusFilter').value;
   let records = recordData.filter(r => {
+    // 移动教学网端不展示已删除的记录
+    if (isCloud && r.status === 'deleted') return false;
     if (nameQ && !r.name.toLowerCase().includes(nameQ)) return false;
     if (statusF && r.status !== statusF) return false;
     if (dateFrom && r.uploadTime.substring(0,10) < dateFrom) return false;
@@ -881,23 +873,24 @@ function renderRecordTable() {
   tbody.innerHTML = paged.map(r => {
     const ic = getFileIcon(r.type);
     const st = getStatusInfo(r.status);
-    const canOperate = (r.status === 'normal' || r.status === 'pending');
-    return `<tr>
-      <td><div class="file-name-cell"><div class="file-icon ${ic.cls}"><i class="fas ${ic.icon}"></i></div><span>${r.name}</span></div></td>
-      <td>${getTypeLabel(r.type)}</td>
-      <td>${r.size}</td>
-      <td>${r.uploadTime}</td>
-      <td>${r.source}</td>
-      <td>${r.approver}</td>
-      <td><span class="status-tag ${st.cls}"><span class="status-dot"></span> ${st.label}</span></td>
-      <td style="color:var(--danger);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.reason}">${r.reason || '-'}</td>
-      <td>
-        <div class="td-actions">
-          ${canOperate ? '<button class="btn-text btn-sm" onclick="previewFile(\'' + r.name + '\',\'' + r.type + '\')"><i class="fas fa-eye"></i> 预览</button>' : ''}
-          ${canOperate ? '<button class="btn-text btn-sm" onclick="downloadFile(\'' + r.name + '\')"><i class="fas fa-download"></i> 下载</button>' : '<span style="color:var(--gray-300);font-size:12px">-</span>'}
-        </div>
-      </td>
-    </tr>`;
+    if (isCloud) {
+      return `<tr>
+        <td><div class="file-name-cell"><div class="file-icon ${ic.cls}"><i class="fas ${ic.icon}"></i></div><span>${r.name}</span></div></td>
+        <td>${getTypeLabel(r.type)}</td>
+        <td>${r.size}</td>
+        <td>${r.uploadTime}</td>
+        <td>${r.approver}</td>
+        <td><span class="status-tag ${st.cls}"><span class="status-dot"></span> ${st.label}</span></td>
+        <td style="color:var(--danger);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.reason}">${r.reason || '-'}</td>
+      </tr>`;
+    } else {
+      return `<tr>
+        <td><div class="file-name-cell"><div class="file-icon ${ic.cls}"><i class="fas ${ic.icon}"></i></div><span>${r.name}</span></div></td>
+        <td>${getTypeLabel(r.type)}</td>
+        <td>${r.size}</td>
+        <td>${r.uploadTime}</td>
+      </tr>`;
+    }
   }).join('');
   renderPagination('recordPagination', records.length, recordPage, recordPageSize, 'goRecordPage');
 }
@@ -926,20 +919,20 @@ function renderApprovalTable() {
   tbody.innerHTML = paged.map(r => {
     const ic = getFileIcon(r.type);
     const st = getStatusInfo(r.status);
-    return `<tr>
-      <td><div class="file-name-cell"><div class="file-icon ${ic.cls}"><i class="fas ${ic.icon}"></i></div><span>${r.name}</span></div></td>
-      <td>${getTypeLabel(r.type)}</td>
-      <td>${r.size}</td>
-      <td>${r.source}</td>
-      <td>${r.uploader}</td>
-      <td>${r.uploadTime}</td>
-      <td><span class="status-tag ${st.cls}"><span class="status-dot"></span> ${st.label}</span></td>
-      <td>
-        ${r.status === 'unapproved'
-          ? '<button class="btn btn-sm btn-primary" onclick="showApprovalModal(' + r.id + ')"><i class="fas fa-gavel"></i> 审批操作</button>'
-          : '<span style="color:var(--gray-300);font-size:12px">已处理</span>'}
-      </td>
-    </tr>`;
+      return `<tr>
+        <td><div class="file-name-cell"><div class="file-icon ${ic.cls}"><i class="fas ${ic.icon}"></i></div><span>${r.name}</span></div></td>
+        <td>${getTypeLabel(r.type)}</td>
+        <td>${r.size}</td>
+        <td>${r.uploader}</td>
+        <td>${r.uploadTime}</td>
+        <td><span class="status-tag ${st.cls}"><span class="status-dot"></span> ${st.label}</span></td>
+        <td style="color:var(--danger);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.reason || ''}">${r.reason || '-'}</td>
+        <td>
+          ${r.status === 'unapproved'
+            ? '<button class="btn btn-sm btn-success" onclick="approveFile(' + r.id + ')"><i class="fas fa-check"></i> 通过</button> <button class="btn btn-sm btn-danger" onclick="showRejectModal(' + r.id + ')"><i class="fas fa-times"></i> 不通过</button>'
+            : '<span style="color:var(--gray-300);font-size:12px">已处理</span>'}
+        </td>
+      </tr>`;
   }).join('');
   renderPagination('approvalPagination', records.length, approvalPage, approvalPageSize, 'goApprovalPage');
 }
@@ -1028,7 +1021,6 @@ function showDeleteFile(name) {
     const idx = fileData.findIndex(f => f.name === name);
     if (idx > -1) fileData.splice(idx, 1);
     renderFileTable();
-    renderTree();
   };
   document.getElementById('confirmDeleteTitle').textContent = '确定删除文件"' + name + '"？';
   document.getElementById('confirmDeleteMsg').textContent = '删除后将无法恢复，请确认操作。';
@@ -1043,11 +1035,25 @@ function confirmDeleteAction() {
 
 // ====== UPLOAD ======
 function showUploadModal() {
-  if (currentFolderId === null || currentFolderId === undefined) { alert('请先选择一个文件夹'); return; }
+  const urlParams = new URLSearchParams(window.location.search);
+  const source = urlParams.get('source');
   document.getElementById('fileInput').value = '';
   document.getElementById('uploadFileList').innerHTML = '';
   document.getElementById('approverSelect').value = '';
-  document.getElementById('approverGroup').style.display = 'block';
+  // 仅云桌面端显示审批者选择
+  document.getElementById('approverGroup').style.display = (source === 'portal') ? 'block' : 'none';
+  // 动态设置传输动画标签和图标
+  const fromEl = document.getElementById('transferFrom');
+  const toEl = document.getElementById('transferTo');
+  if (fromEl && toEl) {
+    if (source === 'portal') {
+      fromEl.innerHTML = '<i class="fas fa-graduation-cap"></i><span>移动教学网</span>';
+      toEl.innerHTML = '<i class="fas fa-globe"></i><span>互联网</span>';
+    } else {
+      fromEl.innerHTML = '<i class="fas fa-globe"></i><span>互联网</span>';
+      toEl.innerHTML = '<i class="fas fa-graduation-cap"></i><span>移动教学网</span>';
+    }
+  }
   openModal('modalUpload');
 }
 
@@ -1081,14 +1087,13 @@ function uploadFiles() {
     const sizeStr = f.size < 1024 ? f.size + ' B' : f.size < 1048576 ? (f.size/1024).toFixed(1) + ' KB' : (f.size/1048576).toFixed(1) + ' MB';
     const source = isCloudDesktop ? '云桌面' : '本地电脑';
     const newId = ++nextFileId;
-    fileData.push({ id: newId, name: f.name, type: t, size: sizeStr, uploadTime: dateStr, source: source, folderId: currentFolderId });
+    fileData.push({ id: newId, name: f.name, type: t, size: sizeStr, uploadTime: dateStr, source: source });
     recordData.push({ id: newId, name: f.name, type: t, size: sizeStr, uploadTime: dateStr, source: source, approver: approverName, status: 'pending', reason: '' });
-    approvalData.push({ id: newId, name: f.name, type: t, size: sizeStr, uploadTime: dateStr, source: source, uploader: '张老师', status: 'unapproved' });
+    approvalData.push({ id: newId, name: f.name, type: t, size: sizeStr, uploadTime: dateStr, source: source, uploader: '张老师', status: 'unapproved', reason: '' });
   }
 
   updateApprovalBadge();
   closeModal('modalUpload');
-  renderTree();
   renderFileTable();
   renderRecordTable();
   renderApprovalTable();
@@ -1107,31 +1112,38 @@ uploadZone.addEventListener('drop', e => {
 });
 
 // ====== APPROVAL ======
-function showApprovalModal(id) {
+function showRejectModal(id) {
   currentApprovalId = id;
   const record = approvalData.find(r => r.id === id);
   if (!record) return;
   document.getElementById('approvalFileName').textContent = record.name;
   document.getElementById('approvalFileMeta').textContent = getTypeLabel(record.type) + ' | ' + record.size + ' | 上传者: ' + record.uploader + ' | ' + record.uploadTime;
-  document.getElementById('rejectReasonGroup').style.display = 'none';
   document.getElementById('rejectReasonInput').value = '';
   openModal('modalApproval');
 }
 
-document.getElementById('rejectBtn').addEventListener('mouseenter', function() {
-  document.getElementById('rejectReasonGroup').style.display = 'block';
-});
-
-function submitApproval(action) {
-  if (action === 'reject') {
-    const reason = document.getElementById('rejectReasonInput').value.trim();
-    if (!reason) { alert('请填写拒绝原因'); return; }
-  }
+function submitReject() {
+  const reason = document.getElementById('rejectReasonInput').value.trim();
+  if (!reason) { alert('请填写不通过原因'); return; }
   const record = approvalData.find(r => r.id === currentApprovalId);
-  if (record) record.status = action === 'approve' ? 'approved' : 'rejected';
+  if (record) {
+    record.status = 'rejected';
+    record.reason = reason;
+  }
   closeModal('modalApproval');
   renderApprovalTable();
   updateApprovalBadge();
+}
+
+function approveFile(id) {
+  const record = approvalData.find(r => r.id === id);
+  if (!record) return;
+  if (confirm('确定通过文件"' + record.name + '"的审批吗？')) {
+    record.status = 'approved';
+    record.reason = '';
+    renderApprovalTable();
+    updateApprovalBadge();
+  }
 }
 
 function updateApprovalBadge() {
@@ -1156,8 +1168,69 @@ function previewFile(name, type) {
 
 function downloadFile(name) { alert('开始下载: ' + name + '（模拟）'); }
 
+// ====== 来源检测 & 功能控制 ======
+(function() {
+  // 检查 URL 参数
+  const urlParams = new URLSearchParams(window.location.search);
+  const source = urlParams.get('source');
+  
+  // 动态设置页面描述
+  const filePageDesc = document.getElementById('filePageDesc');
+  if (filePageDesc) {
+    if (source === 'portal') {
+      filePageDesc.textContent = '接收来自互联网端上传的文件，支持预览、下载、删除等操作';
+    } else {
+      filePageDesc.textContent = '接收来自移动教学网端分发的文件，支持预览、下载、删除等操作';
+    }
+  }
+
+  // 互联网端
+  if (source === 'local') {
+    // 隐藏审批列表
+    const navApproval = document.getElementById('nav-approvalList');
+    const pageApproval = document.getElementById('page-approvalList');
+    if (navApproval) navApproval.style.display = 'none';
+    if (pageApproval) pageApproval.style.display = 'none';
+
+    // 隐藏上传记录中的状态下拉框
+    const statusFilterWrapper = document.getElementById('statusFilterWrapper');
+    if (statusFilterWrapper) statusFilterWrapper.style.display = 'none';
+    
+    // 显示退出登录按钮
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.classList.add('show');
+      logoutBtn.addEventListener('click', function() {
+        if (confirm('确定要退出登录吗？')) {
+          window.location.href = 'login.html';
+        }
+      });
+    }
+  }
+  
+  // 移动教学网端
+  if (source === 'portal') {
+    // 显示"移动教学网"标注
+    const cloudTag = document.getElementById('cloudTag');
+    if (cloudTag) cloudTag.style.display = 'inline-flex';
+    
+    // 显示上传按钮和审批者选择
+    const uploadBtn = document.getElementById('headerUploadBtn');
+    if (uploadBtn) uploadBtn.style.display = 'inline-flex';
+    
+    const approverGroup = document.getElementById('approverGroup');
+    if (approverGroup) approverGroup.style.display = 'block';
+  }
+  
+  // 如果没有 source 参数（互联网环境默认）
+  if (!source || source === 'local') {
+    // 显示上传按钮（互联网环境也需要上传）
+    const uploadBtn = document.getElementById('headerUploadBtn');
+    if (uploadBtn) uploadBtn.style.display = 'inline-flex';
+  }
+})();
+
 // ====== INIT ======
-renderTree();
 renderFileTable();
 renderRecordTable();
 renderApprovalTable();
