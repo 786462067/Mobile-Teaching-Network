@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>移动教学网门户 - 登录</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-page">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="logo">
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="48" height="48" rx="12" fill="#2563EB"/>
+                        <path d="M14 16h20v4H14v-4zm0 8h20v4H14v-4zm0 8h12v4H14v-4z" fill="white"/>
+                    </svg>
+                </div>
+                <h1 class="title">移动教学网门户</h1>
+                <p class="subtitle">统一身份认证登录</p>
+            </div>
+            
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="username" class="form-label">用户名</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2c-3.33 0-10 1.67-10 5v3h20v-3c0-3.33-6.67-5-10-5z" fill="#6B7280"/>
+                        </svg>
+                        <input type="text" id="username" name="username" class="form-input" placeholder="请输入统一认证账号" value="teacher01" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">密码</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M15 8h2a1 1 0 011 1v8a1 1 0 01-1 1H5a1 1 0 01-1-1V9a1 1 0 011-1h2m3-4a3 3 0 016 0v4H6V4a3 3 0 016 0zm-3 6a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" fill="#6B7280"/>
+                        </svg>
+                        <input type="password" id="password" name="password" class="form-input" placeholder="请输入密码" value="password123" required>
+                        <button type="button" class="password-toggle" id="togglePassword">
+                            <svg class="eye-open" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M1 10s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7z" stroke="#6B7280" stroke-width="1.5"/>
+                                <circle cx="10" cy="10" r="3" stroke="#6B7280" stroke-width="1.5"/>
+                            </svg>
+                            <svg class="eye-closed hidden" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M2 2l16 16M7.5 7.51A2.5 2.5 0 0010 10.5M4.1 4.1C2.6 5.2 1.5 6.5 1.1 7.5M9.9 9.9C7.1 11.2 4.3 10.8 2.6 9.6M12.5 5.5c1.6-1 3.4-1.5 5.4-1.3" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-options">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="remember" name="remember">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-label">记住登录状态</span>
+                    </label>
+                    <a href="#" class="forgot-link">忘记密码？</a>
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    <span>登 录</span>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M4 10h12m0 0l-4-4m4 4l-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </form>
+            
+            <div class="login-footer">
+                <p>登录即表示同意<a href="#">《用户协议》</a>和<a href="#">《隐私政策》</a></p>
+            </div>
+        </div>
+        
+        <div class="login-decoration">
+            <div class="decoration-pattern"></div>
+            <div class="decoration-content">
+                <h2>欢迎使用移动教学网</h2>
+                <p>便捷、高效的在线教学管理平台</p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>
