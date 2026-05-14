@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 应用跳转地址映射
             const appRoutes = {
-                '文件传输': '../fileTransfer/index.html',
+                '文件传输': './fileTransfer/index.html',
             };
 
             const targetUrl = appRoutes[appName];
@@ -325,7 +325,7 @@ function addAppToMyApps(appData) {
         if (e.target.closest('.app-remove')) return;
         const appName = appData.name;
         const appRoutes = {
-            '文件传输': '../fileTransfer/index.html',
+            '文件传输': './fileTransfer/index.html',
         };
         const targetUrl = appRoutes[appName];
         if (targetUrl) {
